@@ -1,0 +1,141 @@
+# A simple survey about vacation preferences
+# Written by Michael Maness
+
+SurveySettings GeneralSettings
+  survey_name "Vacation Choice Survey"
+  survey_description "A simple survey to show JULIE's features"
+  section "Section 1 of 2: Most Recent Trip"
+  
+Dummy Intro
+  text "Welcome to the Vacation Choice Survey"
+  text "<br/><br/>"
+  text "First, you will be asked a series of questions about your most recent vacation."
+  calculation after
+    x = 2
+  end
+  
+YesNo RecentVacation
+  text "Have you taken a vacation away from home within the last 12 months?"
+  text "<br/>(Debug statement: The value of x is :(x))"
+  
+MultipleBranch RecentVacationBranch
+  reference RecentVacation
+  branch "Yes", TripLength
+  default_branch EndOfSurvey
+  
+Decimal TripLength
+  text "In terms of days, how long was your trip?"
+  bounds 0, 365
+    
+MultipleChoice Enjoyment
+  text "How much did you enjoyed your trip?"
+  choice "Very much"
+  choice "Somewhat"
+  choice "Indifferent"
+  choice "Not much"
+  choice "Not at all"
+  
+MultipleChoice Enjoyment_Long
+  text "If you could have stayed for :(long_stay) days instead, how much do you think you would have enjoyed your trip?"
+  choice "Very much"
+  choice "Somewhat"
+  choice "Indifferent"
+  choice "Not much"
+  choice "Not at all"
+  calculation before
+    long_stay = TripLength + 3.5
+  end
+  
+YesNo International
+  text "For your most recent trip, did you leave the country?"
+  
+MultipleBranch InternationalBranch
+  reference International
+  branch "Yes", Country
+  branch "No", State
+  
+OpenEnded Country
+  text "What country did you visit primarily?"
+  text "<br/>(If you visited more than one country, which country did you spend the most time at?)"
+  calculation after
+    comma = ","
+  end
+  
+SingleBranch City
+
+OpenEnded State
+  text "What state did you visit?"
+  
+OpenEnded City
+  text "What city did you visit?"
+  
+TextArea TripReason
+  text "How did you decide on visiting :(ci):(comma) :(State) :(co)?"
+  calculation before
+    co = Country    #Not really necessary just shown for example
+    ci = City
+  end
+  
+SurveySettings NewSection
+  section "Section 2 of 2: Future Trip"
+  
+Dummy ExpInstructions
+  text "You will be given four scenarios about different vacations you could choose from."
+  
+Scenario SP1
+  experiment VacationChoice
+  
+Scenario SP2
+  experiment VacationChoice
+  
+Scenario SP3
+  experiment VacationChoice
+  
+Scenario SP4
+  experiment VacationChoice
+  
+ChoiceExperiment VacationChoice
+  
+  attribute Attractions
+    attribute_label "Attractions"
+    add_level 0, 0
+      "Beach"
+    add_level 1, 1
+      "Ski Resort"
+  attribute Cost
+    attribute_label "Trip Cost"
+    add_level 0, 500
+      "$500"
+    add_level 1, 750
+      "$750"
+  attribute Nights
+    attribute_label "Trip Length"
+    add_level 0, 3
+      "3 Nights"
+    add_level 1, 5
+      "5 Nights"
+  
+  alternative "Vacation A"
+    set_levels_for Attractions <- [0 1]
+    set_levels_for Cost <- [0 1]
+    set_levels_for Nights <- [0 1]
+  alternative "Vacation B"
+    set_levels_for Attractions <- [0 1]
+    set_levels_for Cost <- [0 1]
+    set_levels_for Nights <- [0 1]
+  
+  pre_table_text "The following vacation options are available:"
+  post_table_text "From the vacations shown above, which would you prefer for your next trip?"
+  
+  choice "I will take Vacation A"
+  choice "I will take Vacation B"
+  
+  add_design <- [0 0 0]
+  add_design <- [1 1 1]
+  add_design <- [0 1 0]
+  add_design <- [1 0 1]
+  
+Calculation EndOfSurvey
+  1+1
+  
+EndSurvey
